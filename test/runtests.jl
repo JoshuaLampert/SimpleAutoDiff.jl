@@ -25,5 +25,8 @@ using Test
         @test derivative(f, 3.0) == 24.0
         g(x) = 1/x
         @test derivative(g, 2) == -0.25
+
+        h = derivative(g)
+        @test h(2.0) == -0.25
     end
 end
