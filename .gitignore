@@ -1,1 +1,12 @@
-/Manifest.toml
+*.pdf
+*.png
+*.jl.*.cov
+*.jl.cov
+*.jl.mem
+**/Manifest.toml
+out*/
+/docs/build/
+run
+run/*
+**/*.code-workspace
+.vscode/
