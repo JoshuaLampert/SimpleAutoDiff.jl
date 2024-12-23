@@ -1,5 +1,7 @@
 module SimpleAutoDiff
 
-# Write your package code here.
+include("dual_numbers.jl")
+include("derivative.jl")
+export DualNumber, value, derivative
 
 end
