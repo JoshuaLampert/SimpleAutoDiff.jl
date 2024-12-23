@@ -21,12 +21,17 @@ using Test
     end
 
     @testset "derivative" begin
-        f(x) = 4.0 * x^2 - 1.0
-        @test derivative(f, 3.0) == 24.0
-        g(x) = 1/x
-        @test derivative(g, 2) == -0.25
+        f1(x) = 4.0 * x^2 - 1.0
+        @test derivative(f1, 3.0) == 24.0
+        f2(x) = 1/x
+        @test derivative(f2, 2) == -0.25
+        f3(x) = sin(x) * cos(x)
+        @test derivative(f3, pi) == 1.0
+        f4(x) = log(x) * exp(x)
+        a = 2.0
+        @test isapprox(derivative(f4, a), exp(a) * (a * log(a) + 1) / a, atol = 1e-14)
 
-        h = derivative(g)
+        h = derivative(f2)
         @test h(2.0) == -0.25
     end
 end
