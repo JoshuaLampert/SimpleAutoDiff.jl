@@ -15,7 +15,7 @@ using Test
         @test x + y == DualNumber(4.0, 6.0)
         @test x - y == DualNumber(-2.0, -2.0)
         @test x * y == DualNumber(3.0, 10.0)
-        @test x / y == DualNumber(1/3, 2/9)
+        @test x / y == DualNumber(1 / 3, 2 / 9)
 
         @test 1.0 + x == DualNumber(2.0, 2.0)
     end
@@ -23,7 +23,7 @@ using Test
     @testset "derivative" begin
         f1(x) = 4.0 * x^2 - 1.0
         @test derivative(f1, 3.0) == 24.0
-        f2(x) = 1/x
+        f2(x) = 1 / x
         @test derivative(f2, 2) == -0.25
         f3(x) = sin(x) * cos(x)
         @test derivative(f3, pi) == 1.0
