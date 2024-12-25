@@ -2,6 +2,7 @@
 
 [![Build Status](https://github.com/JoshuaLampert/SimpleAutoDiff.jl/actions/workflows/CI.yml/badge.svg?branch=main)](https://github.com/JoshuaLampert/SimpleAutoDiff.jl/actions/workflows/CI.yml?query=branch%3Amain)
 [![codecov](https://codecov.io/gh/JoshuaLampert/SimpleAutoDiff.jl/graph/badge.svg?token=yKB7uIDHXE)](https://codecov.io/gh/JoshuaLampert/SimpleAutoDiff.jl)
+[![Aqua QA](https://raw.githubusercontent.com/JuliaTesting/Aqua.jl/master/badge.svg)](https://github.com/JuliaTesting/Aqua.jl)
 [![License: MIT](https://img.shields.io/badge/License-MIT-success.svg)](https://opensource.org/licenses/MIT)
 
 **SimpleAutoDiff.jl** is [Julia](https://julialang.org/) package, which implements simple forward-mode automatic differentiation (AD). It is not
