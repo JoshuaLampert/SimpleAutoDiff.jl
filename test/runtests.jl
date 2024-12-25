@@ -1,4 +1,5 @@
 using SimpleAutoDiff
+using SpecialFunctions
 using Test
 
 @testset "SimpleAutoDiff.jl" begin
@@ -28,8 +29,14 @@ using Test
         f3(x) = sin(x) * cos(x)
         @test derivative(f3, pi) == 1.0
         f4(x) = log(x) * exp(x)
-        a = 2.0
+        a = 42.1
         @test isapprox(derivative(f4, a), exp(a) * (a * log(a) + 1) / a, atol = 1e-14)
+        f5(x) = tan(x)
+        @test isapprox(derivative(f5, a), sec(a)^2, atol = 1e-14)
+        f6(x) = x * abs(x)
+        @test derivative(f6, 2.0) == 4.0
+        f7(x) = gamma(x)
+        @test derivative(f7, a) == digamma(a) * gamma(a)
 
         h = derivative(f2)
         @test h(2.0) == -0.25
