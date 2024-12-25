@@ -8,6 +8,8 @@
 meant to be the most performant implementation, but rather focuses on simplicity and readability of the code. It only implements the core features
 of AD without claiming optimal performance and flexibility. Therefore, it is a good starting point to understand or teach automatic/algorithmic
 differentiation, but is not the perfect choice for production use. For alternative packages performing AD, see the list in https://juliadiff.org/.
+The implementation in this package is closest to the implementation of [ForwardDiff.jl](https://github.com/JuliaDiff/ForwardDiff.jl), but is a lot
+simplified.
 
 ## Installation
 
