@@ -1,5 +1,6 @@
 using SimpleAutoDiff
 using SpecialFunctions
+using LinearAlgebra
 using Test
 
 @testset "SimpleAutoDiff.jl" begin
@@ -10,6 +11,7 @@ using Test
         @test derivative(x) == 2
         y = DualNumber(3, 4.0)
         @test real(y) == Float64
+        @test float(y) == y
         @test value(y) == 3.0
         @test derivative(y) == 4.0
 
@@ -19,6 +21,12 @@ using Test
         @test x / y == DualNumber(1 / 3, 2 / 9)
 
         @test 1.0 + x == DualNumber(2.0, 2.0)
+
+        @test !isinf(x)
+        @test x < y
+        @test x <= y
+        @test y > 2
+        @test 4 > y
     end
 
     @testset "derivative" begin
@@ -45,6 +53,7 @@ using Test
     @testset "gradient" begin
         f1(x) = sin(x[1]) * cos(x[2])
         @test isapprox(gradient(f1, [pi, -pi]), [1.0, 0.0], atol = 1e-15)
+        @test gradient(x -> norm(x)^2, [1.0, 2.0]) == [2.0, 4.0]
 
         h = gradient(f1)
         @test isapprox(h([-pi, pi]), [1.0, 0.0], atol = 1e-15)
