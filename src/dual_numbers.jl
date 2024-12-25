@@ -12,10 +12,12 @@ end
 
 DualNumber(value::Real, deriv::Real) = DualNumber(promote(value, deriv)...)
 
-value(x::DualNumber) = x.value
-derivative(x::DualNumber) = x.deriv
+value(d::DualNumber) = d.value
+derivative(d::DualNumber) = d.deriv
 
 Base.real(::DualNumber{T}) where {T} = T
+Base.float(::Type{DualNumber{T}}) where {T} = DualNumber{T}
+Base.float(d::DualNumber) = convert(float(typeof(d)), d)
 
 Base.convert(::Type{DualNumber{T}}, x::Real) where {T<:Real} = DualNumber(x, zero(T))
 Base.promote_rule(::Type{DualNumber{T}}, ::Type{<:Real}) where {T<:Real} = DualNumber{T}
@@ -41,4 +43,18 @@ for (M, f, arity) in DiffRules.diffrules(filter_modules = nothing)
             return DualNumber(val, deriv * derivative(d))
         end
     end
+end
+
+const UNARY_PREDICATES = Symbol[:isinf, :isnan, :isfinite, :iseven, :isodd, :isreal, :isinteger]
+
+for pred in UNARY_PREDICATES
+   @eval Base.$(pred)(d::DualNumber) = $(pred)(value(d))
+end
+
+const BINARY_PREDICATES = Symbol[:isequal, :isless, :<, :>, :(==), :(!=), :(<=), :(>=)]
+
+for pred in BINARY_PREDICATES
+    @eval Base.$(pred)(x::DualNumber, y::DualNumber) = $(pred)(value(x), value(y))
+    @eval Base.$(pred)(x::DualNumber, y) = $(pred)(value(x), y)
+    @eval Base.$(pred)(x, y::DualNumber) = $(pred)(x, value(y))
 end
