@@ -11,11 +11,63 @@ differentiation, but is not the perfect choice for production use. For alternati
 
 ## Installation
 
-TODO.
+If you have not yet installed Julia, then you first need to [download Julia](https://julialang.org/downloads/).
+Please [follow the instructions for your operating system](https://julialang.org/downloads/platform/).
+SimpleAutoDiff.jl works with Julia v1.10 and newer. You can install SimpleAutoDiff.jl by executing the following commands from the Julia REPL
+
+```julia
+julia> using Pkg
+
+julia> Pkg.add("https://github.com/JoshuaLampert/SimpleAutoDiff.jl")
+```
 
 ## Usage
+In the Julia REPL, first load the package SimpleAutoDiff.jl
 
-TODO.
+```julia
+julia> using SimpleAutoDiff
+```
+
+Until now, SimpleAutoDiff.jl can only differentiate scalar functions of one or several variables, i.e. it can compute `derivative`s (scalar input)
+and `gradient`s (vector input). To compute the derivative of a function $f: \mathbb{R}\to\mathbb{R}$, you can run
+
+```julia
+julia> f(x) = sin(x) * cos(x) + x^2
+f (generic function with 1 method)
+
+julia> derivative(f, pi)
+7.283185307179586 # = 1 + 2pi
+```
+
+You can also get the `derivative` as a function
+
+```julia
+julia> g = derivative(f)
+#1 (generic function with 1 method)
+
+julia> g(pi)
+7.283185307179586
+```
+
+Similarly, you can call `gradient` with a vector input.
+
+```julia
+julia> h(x) = cos(x[1]) * sin(x[2])
+h (generic function with 1 method)
+
+julia> gradient(h, [pi, 1])
+2-element Vector{Float64}:
+ -1.0305047481203616e-16
+ -0.5403023058681398
+
+julia> grad_h = gradient(h)
+#3 (generic function with 1 method)
+
+julia> grad_h([pi, 1])
+2-element Vector{Float64}:
+ -1.0305047481203616e-16
+ -0.5403023058681398
+ ```
 
 ## Authors
 
