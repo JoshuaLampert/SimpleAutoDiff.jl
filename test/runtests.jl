@@ -25,6 +25,8 @@ using Test
         @test !isinf(x)
         @test x < y
         @test x <= y
+        @test y > 2
+        @test 4 > y
     end
 
     @testset "derivative" begin
