@@ -30,16 +30,15 @@ function Base.:/(x::DualNumber, y::DualNumber)
     DualNumber(x.value / y.value, (x.deriv * y.value - x.value * y.deriv) / y.value^2)
 end
 
-function Base.sin(x::DualNumber)
-    si, co = sincos(value(x))
-    return DualNumber(si, co * derivative(x))
-end
-function Base.cos(x::DualNumber)
-    si, co = sincos(value(x))
-    return DualNumber(co, -si * derivative(x))
-end
-Base.log(x::DualNumber) = DualNumber(log(value(x)), derivative(x) / value(x))
-function Base.exp(x::DualNumber)
-    ex = exp(value(x))
-    return DualNumber(ex, ex * derivative(x))
+# For each unitary rule in DiffRules.jl define a function dispatching on `DualNumber`
+for (M, f, arity) in DiffRules.diffrules(filter_modules = nothing)
+    if arity == 1
+        Mf = M == :Base ? f : :($M.$f)
+        @eval function $M.$f(d::DualNumber)
+            x = $SimpleAutoDiff.value(d)
+            val = $Mf(x)
+            deriv = $(DiffRules.diffrule(M, f, :x))
+            return DualNumber(val, deriv * derivative(d))
+        end
+    end
 end
