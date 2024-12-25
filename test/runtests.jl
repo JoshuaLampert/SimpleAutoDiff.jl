@@ -34,4 +34,12 @@ using Test
         h = derivative(f2)
         @test h(2.0) == -0.25
     end
+
+    @testset "gradient" begin
+        f1(x) = sin(x[1]) * cos(x[2])
+        @test isapprox(gradient(f1, [pi, -pi]), [1.0, 0.0], atol = 1e-15)
+
+        h = gradient(f1)
+        @test isapprox(h([-pi, pi]), [1.0, 0.0], atol = 1e-15)
+    end
 end
