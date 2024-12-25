@@ -45,10 +45,11 @@ for (M, f, arity) in DiffRules.diffrules(filter_modules = nothing)
     end
 end
 
-const UNARY_PREDICATES = Symbol[:isinf, :isnan, :isfinite, :iseven, :isodd, :isreal, :isinteger]
+const UNARY_PREDICATES =
+    Symbol[:isinf, :isnan, :isfinite, :iseven, :isodd, :isreal, :isinteger]
 
 for pred in UNARY_PREDICATES
-   @eval Base.$(pred)(d::DualNumber) = $(pred)(value(d))
+    @eval Base.$(pred)(d::DualNumber) = $(pred)(value(d))
 end
 
 const BINARY_PREDICATES = Symbol[:isequal, :isless, :<, :>, :(==), :(!=), :(<=), :(>=)]
