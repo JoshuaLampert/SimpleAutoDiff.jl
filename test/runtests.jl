@@ -71,4 +71,23 @@ using Test
         h = gradient(f1)
         @test isapprox(h([-pi, pi]), [1.0, 0.0], atol = 1e-15)
     end
+
+    @testset "jacobian" begin
+        f1(x) = [sin(x[1]) * cos(x[2]), tanh(x[2] * sec(x[1])), acos(x[1] + x[2])]
+        a = [pi, -pi]
+        J = [
+            1.0 0.0
+            0.0 -0.007441950142796139
+            -1.0 -1.0
+        ]
+        @test isapprox(jacobian(f1, a), J, atol = 1e-15)
+        f2(x) = [tanh(x[3] * x[2]^2) * exp(x[1]), log(x[3] * x[1])]
+        jac = zeros(2, 3)
+        x0 = [2.0, -1.0, pi]
+        @test_nowarn jacobian!(jac, f2, x0)
+        @test jac == jacobian(f2, x0)
+
+        h = jacobian(f1)
+        @test isapprox(h(a), J, atol = 1e-15)
+    end
 end
