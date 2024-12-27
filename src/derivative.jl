@@ -12,14 +12,15 @@ Compute the derivative of a function `f` and return the derivative as a function
 """
 derivative(f) = x0 -> derivative(f, x0)
 
-
 """
-    gradient(f, x0)
+    gradient!(grad, f, x0)
 
-Compute the gradient of a function `f` mapping a vector to a scalar evaluated at a value `x0`.
+Computes the gradient of a function `f` mapping a vector to a scalar evaluated at a value `x0`
+in-place and overwrites `grad` by the gradient.
+
+See also [`gradient`](@ref) for an out-of-place version of the function.
 """
-function gradient(f, x0)
-    grad = zeros(typeof(f(x0)), length(x0))
+function gradient!(grad, f, x0)
     x = similar(x0, DualNumber{eltype(x0)})
     copyto!(x, x0)
     for i in eachindex(x)
@@ -28,6 +29,18 @@ function gradient(f, x0)
         x[i] = x0[i]
     end
     return grad
+end
+
+"""
+    gradient(f, x0)
+
+Compute the gradient of a function `f` mapping a vector to a scalar evaluated at a value `x0`.
+
+See also [`gradient!`](@ref) for an in-place version of the function.
+"""
+function gradient(f, x0)
+    grad = zeros(typeof(f(x0)), length(x0))
+    return gradient!(grad, f, x0)
 end
 
 """
