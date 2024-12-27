@@ -59,6 +59,7 @@ using Test
 
         h = derivative(f2)
         @test h(2.0) == -0.25
+        @test derivative(derivative(f1), 1.0) == 8.0
     end
 
     @testset "gradient" begin
