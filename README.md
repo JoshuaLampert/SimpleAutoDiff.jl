@@ -31,7 +31,8 @@ In the Julia REPL, first load the package SimpleAutoDiff.jl
 julia> using SimpleAutoDiff
 ```
 
-SimpleAutoDiff.jl can compute first-order derivatives of scalar or vector-valued functions of one or several variables.
+SimpleAutoDiff.jl can compute first-order derivatives of scalar or vector-valued functions of one or several variables and Hessian
+matrices for scalar functions with vector input.
 
 ### Derivative of a function $f: \mathbb{R}\to\mathbb{R}$
 
@@ -114,6 +115,32 @@ julia> J([pi, -1])
 ```
 
 Again, there is an in-place version `jacobian!`, which takes a preallocated matrix of correct shape.
+
+### Hessian matrix of a function $f: \mathbb{R}^n\to\mathbb{R}$
+
+You can compute Hessians (i.e. the Jacobian of the gradient) by
+
+```julia
+julia> using LinearAlgebra
+
+julia> f(x) = norm(x)^2
+f (generic function with 1 method)
+
+julia> hessian(f, [1.0, 2.0])
+2×2 Matrix{Float64}:
+ 2.0  0.0
+ 0.0  2.0
+
+julia> H = hessian(f)
+#7 (generic function with 1 method)
+
+julia> H([3.0, 3.0])
+2×2 Matrix{Float64}:
+ 2.0  0.0
+ 0.0  2.0
+```
+
+There also exists the in-place function `hessian!`.
 
 ## Authors
 
