@@ -7,6 +7,6 @@ import NaNMath
 
 include("dual_numbers.jl")
 include("derivative.jl")
-export DualNumber, value, derivative, gradient
+export DualNumber, value, derivative, gradient, gradient!
 
 end

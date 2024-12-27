@@ -62,6 +62,11 @@ using Test
         f1(x) = sin(x[1]) * cos(x[2])
         @test isapprox(gradient(f1, [pi, -pi]), [1.0, 0.0], atol = 1e-15)
         @test gradient(x -> norm(x)^2, [1.0, 2.0]) == [2.0, 4.0]
+        f2(x) = tanh(x[1]) * tan(x[1])
+        grad = zeros(2)
+        x0 = [2.0, -1.0]
+        @test_nowarn gradient!(grad, f2, x0)
+        @test grad == gradient(f2, x0)
 
         h = gradient(f1)
         @test isapprox(h([-pi, pi]), [1.0, 0.0], atol = 1e-15)
