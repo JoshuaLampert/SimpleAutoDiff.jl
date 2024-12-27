@@ -75,9 +75,11 @@ using Test
     @testset "jacobian" begin
         f1(x) = [sin(x[1]) * cos(x[2]), tanh(x[2] * sec(x[1])), acos(x[1] + x[2])]
         a = [pi, -pi]
-        J = [1.0 0.0
-             0.0 -0.007441950142796139
-             -1.0 -1.0]
+        J = [
+            1.0 0.0
+            0.0 -0.007441950142796139
+            -1.0 -1.0
+        ]
         @test isapprox(jacobian(f1, a), J, atol = 1e-15)
         f2(x) = [tanh(x[3] * x[2]^2) * exp(x[1]), log(x[3] * x[1])]
         jac = zeros(2, 3)
