@@ -91,3 +91,29 @@ end
 Compute the Jacobian matrix of a function `f` and return it as a function.
 """
 jacobian(f) = x0 -> jacobian(f, x0)
+
+"""
+    hessian!(hess, f, x0)
+
+Computes the Hessian matrix of a function `f` mapping a vector to a scalar evaluated at a value `x0`
+in-place and overwrites `hess` by the Hessian.
+
+See also [`hessian`](@ref) for an out-of-place version of the function.
+"""
+hessian!(hess, f, x0) = jacobian!(hess, gradient(f), x0)
+
+"""
+    hessian(f, x0)
+
+Compute the Hessian matrix of a function `f` mapping a vector to a scalar evaluated at a value `x0`.
+
+See also [`hessian!`](@ref) for an in-place version of the function.
+"""
+hessian(f, x0) = jacobian(gradient(f), x0)
+
+"""
+    hessian(f)
+
+Compute the Hessian matrix of a function `f` and return it as a function.
+"""
+hessian(f) = x0 -> hessian(f, x0)
