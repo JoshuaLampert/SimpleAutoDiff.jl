@@ -70,7 +70,22 @@ julia> grad_h([pi, 1])
 2-element Vector{Float64}:
  -1.0305047481203616e-16
  -0.5403023058681398
- ```
+```
+
+To avoid allocating a vector for the gradient, you can also call the in-place variant `gradient!` and additionally passing a vector.
+This can be especially useful, when you repeatedly call the gradient.
+
+```julia
+julia> grad = zeros(2)
+2-element Vector{Float64}:
+ 0.0
+ 0.0
+
+julia> gradient!(grad, h, [pi, 1])
+2-element Vector{Float64}:
+ -1.0305047481203616e-16
+ -0.5403023058681398
+```
 
 ## Authors
 
