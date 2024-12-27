@@ -31,9 +31,11 @@ In the Julia REPL, first load the package SimpleAutoDiff.jl
 julia> using SimpleAutoDiff
 ```
 
-Until now, SimpleAutoDiff.jl can only differentiate scalar functions of one or several variables, i.e. it can compute `derivative`s (scalar input)
-and `gradient`s (vector input). To compute the derivative of a function $f: \mathbb{R}\to\mathbb{R}$, you can run
+SimpleAutoDiff.jl can compute first-order derivatives of scalar or vector-valued functions of one or several variables.
 
+### Derivative of a function $f: \mathbb{R}\to\mathbb{R}$
+
+To compute the `derivative` of a scalar function of one variable, you can run
 ```julia
 julia> f(x) = sin(x) * cos(x) + x^2
 f (generic function with 1 method)
@@ -51,6 +53,8 @@ julia> g = derivative(f)
 julia> g(pi)
 7.283185307179586
 ```
+
+### Gradient of a function $f: \mathbb{R}^n\to\mathbb{R}$
 
 Similarly, you can call `gradient` with a vector input.
 
@@ -86,6 +90,30 @@ julia> gradient!(grad, h, [pi, 1])
  -1.0305047481203616e-16
  -0.5403023058681398
 ```
+
+### Jacobian matrix of a function $f: \mathbb{R}^n\to\mathbb{R}^m$
+
+To compute the Jacobian matrix, there is `jacobian`.
+
+```julia
+julia> f(x) = [cos(x[1]) * sin(x[2]), tanh(x[2])]
+f (generic function with 1 method)
+
+julia> jacobian(f, [pi, -1])
+2×2 Matrix{Float64}:
+ 1.0305e-16  -0.540302
+ 0.0          0.419974
+
+julia> J = jacobian(f)
+#5 (generic function with 1 method)
+
+julia> J([pi, -1])
+2×2 Matrix{Float64}:
+ 1.0305e-16  -0.540302
+ 0.0          0.419974
+```
+
+Again, there is an in-place version `jacobian!`, which takes a preallocated matrix of correct shape.
 
 ## Authors
 
