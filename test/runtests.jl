@@ -27,6 +27,7 @@ using Test
         @test x - y == DualNumber(-2.0, -2.0)
         @test x * y == DualNumber(3.0, 10.0)
         @test x / y == DualNumber(1 / 3, 2 / 9)
+        @test x^y == DualNumber(1.0, 6.0)
 
         @test 1.0 + x == DualNumber(2.0, 2.0)
 
@@ -53,6 +54,8 @@ using Test
         @test derivative(f6, 2.0) == 4.0
         f7(x) = gamma(x)
         @test derivative(f7, a) == digamma(a) * gamma(a)
+        f8(x) = 2^x
+        @test derivative(f8, a) == log(2) * 2^a
 
         h = derivative(f2)
         @test h(2.0) == -0.25
