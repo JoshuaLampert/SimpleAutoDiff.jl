@@ -19,6 +19,7 @@ using Test
         @test derivative(x) == 2
         y = DualNumber(3, 4.0)
         @test eltype(y) == Float64
+        @test eltype(typeof(y)) == Float64
         @test float(y) == y
         @test value(y) == 3.0
         @test derivative(y) == 4.0

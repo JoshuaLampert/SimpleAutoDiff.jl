@@ -26,9 +26,6 @@ Base.float(d::DualNumber) = convert(float(typeof(d)), d)
 Base.convert(::Type{DualNumber{T}}, x::Number) where {T} = DualNumber(x, zero(T))
 Base.convert(::Type{D}, d::D) where {D<:DualNumber} = d
 Base.promote_rule(::Type{DualNumber{T}}, ::Type{<:Real}) where {T<:Real} = DualNumber{T}
-function Base.promote_rule(::Type{DualNumber{T1}}, ::Type{DualNumber{T2}}) where {T1,T2}
-    return DualNumber{promote_type(T1, T2)}
-end
 
 # diff rules
 # Define binary diff rules by hand. We are missing some from DiffRules.jl (e.g. atan, hypot, ...),
