@@ -14,11 +14,11 @@ using Test
 
     @testset "Dual numbers" begin
         x = DualNumber(1, 2)
-        @test real(x) == Int64
+        @test eltype(x) == Int64
         @test value(x) == 1
         @test derivative(x) == 2
         y = DualNumber(3, 4.0)
-        @test real(y) == Float64
+        @test eltype(y) == Float64
         @test float(y) == y
         @test value(y) == 3.0
         @test derivative(y) == 4.0
@@ -59,11 +59,14 @@ using Test
 
         h = derivative(f2)
         @test h(2.0) == -0.25
+        @test derivative(derivative(f1), 1.0) == 8.0
     end
 
     @testset "gradient" begin
         f1(x) = sin(x[1]) * cos(x[2])
-        @test isapprox(gradient(f1, [pi, -pi]), [1.0, 0.0], atol = 1e-15)
+        a = [pi, -pi]
+        G = [1.0, 0.0]
+        @test isapprox(gradient(f1, a), G, atol = 1e-15)
         @test gradient(x -> norm(x)^2, [1.0, 2.0]) == [2.0, 4.0]
         f2(x) = tanh(x[1]) * tan(x[1])
         grad = zeros(2)
@@ -72,7 +75,7 @@ using Test
         @test grad == gradient(f2, x0)
 
         h = gradient(f1)
-        @test isapprox(h([-pi, pi]), [1.0, 0.0], atol = 1e-15)
+        @test isapprox(h(a), G, atol = 1e-15)
     end
 
     @testset "jacobian" begin
@@ -92,5 +95,27 @@ using Test
 
         h = jacobian(f1)
         @test isapprox(h(a), J, atol = 1e-15)
+    end
+
+    @testset "hessian" begin
+        f1(x) = sin(x[1]^2) * cos(x[2]^2)
+        a = [pi, -pi]
+        H = [
+            -13.704786185347317 15.334467910643793
+            15.334467910643793 -15.704786185347313
+        ]
+        @test isapprox(hessian(f1, a), H, atol = 1e-15)
+        @test hessian(x -> norm(x)^2, [1.0, 2.0]) == [
+            2.0 0.0
+            0.0 2.0
+        ]
+        f2(x) = tanh(x[1]) * tan(x[1])
+        hess = zeros(2, 2)
+        x0 = [2.0, -1.0]
+        @test_nowarn hessian!(hess, f2, x0)
+        @test hess == hessian(f2, x0)
+
+        h = hessian(f1)
+        @test isapprox(h(a), H, atol = 1e-15)
     end
 end
