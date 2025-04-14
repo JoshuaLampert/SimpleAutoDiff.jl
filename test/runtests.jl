@@ -82,11 +82,9 @@ using Test
     @testset "jacobian" begin
         f1(x) = [sin(x[1]) * cos(x[2]), tanh(x[2] * sec(x[1])), acos(x[1] + x[2])]
         a = [pi, -pi]
-        J = [
-            1.0 0.0
-            0.0 -0.007441950142796139
-            -1.0 -1.0
-        ]
+        J = [1.0 0.0
+             0.0 -0.007441950142796139
+             -1.0 -1.0]
         @test isapprox(jacobian(f1, a), J, atol = 1e-15)
         f2(x) = [tanh(x[3] * x[2]^2) * exp(x[1]), log(x[3] * x[1])]
         jac = zeros(2, 3)
@@ -101,15 +99,11 @@ using Test
     @testset "hessian" begin
         f1(x) = sin(x[1]^2) * cos(x[2]^2)
         a = [pi, -pi]
-        H = [
-            -13.704786185347317 15.334467910643793
-            15.334467910643793 -15.704786185347313
-        ]
+        H = [-13.704786185347317 15.334467910643793
+             15.334467910643793 -15.704786185347313]
         @test isapprox(hessian(f1, a), H, atol = 1e-15)
-        @test hessian(x -> norm(x)^2, [1.0, 2.0]) == [
-            2.0 0.0
-            0.0 2.0
-        ]
+        @test hessian(x -> norm(x)^2, [1.0, 2.0]) == [2.0 0.0
+                                                      0.0 2.0]
         f2(x) = tanh(x[1]) * tan(x[1])
         hess = zeros(2, 2)
         x0 = [2.0, -1.0]
