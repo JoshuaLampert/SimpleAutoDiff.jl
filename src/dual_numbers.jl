@@ -33,15 +33,16 @@ Base.promote_rule(::Type{DualNumber{T}}, ::Type{<:Real}) where {T <: Real} = Dua
 Base.:+(x::DualNumber, y::DualNumber) = DualNumber(x.value + y.value, x.deriv + y.deriv)
 Base.:-(x::DualNumber, y::DualNumber) = DualNumber(x.value - y.value, x.deriv - y.deriv)
 function Base.:*(x::DualNumber, y::DualNumber)
-    DualNumber(x.value * y.value, x.value * y.deriv + x.deriv * y.value)
+    return DualNumber(x.value * y.value, x.value * y.deriv + x.deriv * y.value)
 end
 function Base.:/(x::DualNumber, y::DualNumber)
-    DualNumber(x.value / y.value, (x.deriv * y.value - x.value * y.deriv) / y.value^2)
+    return DualNumber(x.value / y.value,
+                      (x.deriv * y.value - x.value * y.deriv) / y.value^2)
 end
 function Base.:^(x::DualNumber, y::DualNumber)
-    DualNumber(x.value^y.value,
-               x.value^(y.value - 1) *
-               (y.value * x.deriv + x.value * y.deriv * log(x.value)))
+    return DualNumber(x.value^y.value,
+                      x.value^(y.value - 1) *
+                      (y.value * x.deriv + x.value * y.deriv * log(x.value)))
 end
 
 # For each unitary rule in DiffRules.jl define a function dispatching on `DualNumber`
