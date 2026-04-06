@@ -1,9 +1,6 @@
 module SimpleAutoDiff
 
 import DiffRules
-import SpecialFunctions
-import LogExpFunctions
-import NaNMath
 
 include("dual_numbers.jl")
 include("derivative.jl")
