@@ -67,9 +67,9 @@ end
 
 const BINARY_PREDICATES = Symbol[:isequal, :isless, :<, :>, :(==), :(!=), :(<=), :(>=)]
 # The ambiguous types are needed to avoid method ambiguities. We need to specialize the second non-DualNumber argument.
-# From https://github.com/JuliaDiff/ForwardDiff.jl/blob/v0.10.38/src/dual.jl#L146 and
+# Adapted from https://github.com/JuliaDiff/ForwardDiff.jl/blob/v0.10.38/src/dual.jl#L146 and
 # https://github.com/JuliaDiff/ForwardDiff.jl/blob/v0.10.38/src/prelude.jl#L9
-const AMBIGUOUS_TYPES = (AbstractFloat, Irrational, Integer, Rational, Real, RoundingMode)
+const AMBIGUOUS_TYPES = (AbstractFloat, AbstractIrrational, Integer, Rational, Real)
 
 for pred in BINARY_PREDICATES
     @eval Base.$(pred)(x::DualNumber, y::DualNumber) = $(pred)(value(x), value(y))
@@ -78,3 +78,6 @@ for pred in BINARY_PREDICATES
         @eval Base.$(pred)(x::$R, y::DualNumber) = $(pred)(x, value(y))
     end
 end
+
+# Consistent with `isequal`, which only compares the values
+Base.hash(d::DualNumber, h::UInt) = hash(value(d), h)

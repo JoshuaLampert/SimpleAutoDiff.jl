@@ -7,7 +7,7 @@ using Test
     @testset "Code quality" begin
         import Aqua
         using ExplicitImports: test_explicit_imports
-        Aqua.test_all(ambiguities = false, SimpleAutoDiff)
+        Aqua.test_all(SimpleAutoDiff)
         # `diffrules` and `diffrule` are documented API of DiffRules.jl, but not declared `public`
         ignore = (:diffrules, :diffrule)
         test_explicit_imports(SimpleAutoDiff;
@@ -43,6 +43,15 @@ using Test
         @test x <= y
         @test y > 2
         @test 4 > y
+        @test x != pi
+
+        # `hash` must be consistent with `isequal`, which only compares the values
+        @test isequal(DualNumber(1.0, 2.0), DualNumber(1.0, 3.0))
+        @test hash(DualNumber(1.0, 2.0)) == hash(DualNumber(1.0, 3.0))
+        @test hash(DualNumber(1.0, 2.0)) == hash(1.0)
+        @test haskey(Dict(DualNumber(1.0, 2.0) => 1), 1.0)
+        duals = [DualNumber(1.0, 2.0), DualNumber(1.0, 3.0), DualNumber(2.0, 2.0)]
+        @test length(Set(duals)) == 2
     end
 
     @testset "derivative" begin
