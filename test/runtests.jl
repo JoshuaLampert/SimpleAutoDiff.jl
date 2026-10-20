@@ -22,17 +22,21 @@ using Test
         y = DualNumber(3, 4.0)
         @test eltype(y) == Float64
         @test eltype(typeof(y)) == Float64
-        @test float(y) == y
+        @test float(y) === y
         @test value(y) == 3.0
         @test derivative(y) == 4.0
 
-        @test x + y == DualNumber(4.0, 6.0)
-        @test x - y == DualNumber(-2.0, -2.0)
-        @test x * y == DualNumber(3.0, 10.0)
-        @test x / y == DualNumber(1 / 3, 2 / 9)
-        @test x^y == DualNumber(1.0, 6.0)
+        # `==` only compares the values of dual numbers. Use `===` to also compare
+        # the derivatives (and the types).
+        @test DualNumber(1.0, 2.0) == DualNumber(1.0, 3.0)
+        @test DualNumber(1.0, 2.0) !== DualNumber(1.0, 3.0)
+        @test x + y === DualNumber(4.0, 6.0)
+        @test x - y === DualNumber(-2.0, -2.0)
+        @test x * y === DualNumber(3.0, 10.0)
+        @test x / y === DualNumber(1 / 3, 2 / 9)
+        @test x^y === DualNumber(1.0, 6.0)
 
-        @test 1.0 + x == DualNumber(2.0, 2.0)
+        @test 1.0 + x === DualNumber(2.0, 2.0)
 
         @test !isinf(x)
         @test x < y
