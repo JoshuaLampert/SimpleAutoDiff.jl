@@ -18,8 +18,6 @@ end
 value(d::DualNumber) = d.value
 derivative(d::DualNumber) = d.deriv
 
-Base.eltype(::DualNumber{T}) where {T} = T
-Base.eltype(::Type{DualNumber{T}}) where {T} = T
 Base.float(::Type{DualNumber{T}}) where {T} = DualNumber{T}
 Base.float(d::DualNumber) = convert(float(typeof(d)), d)
 

@@ -16,12 +16,11 @@ using Test
 
     @testset "Dual numbers" begin
         x = DualNumber(1, 2)
-        @test eltype(x) == Int64
+        @test x isa DualNumber{Int64}
         @test value(x) == 1
         @test derivative(x) == 2
         y = DualNumber(3, 4.0)
-        @test eltype(y) == Float64
-        @test eltype(typeof(y)) == Float64
+        @test y isa DualNumber{Float64}
         @test float(y) === y
         @test value(y) == 3.0
         @test derivative(y) == 4.0
@@ -52,6 +51,11 @@ using Test
         @test haskey(Dict(DualNumber(1.0, 2.0) => 1), 1.0)
         duals = [DualNumber(1.0, 2.0), DualNumber(1.0, 3.0), DualNumber(2.0, 2.0)]
         @test length(Set(duals)) == 2
+
+        # Like other numbers, dual numbers behave as scalars in iteration and broadcasting
+        @test eltype(y) === typeof(y)
+        @test only(collect(y)) === y
+        @test all(y * [1.0, 2.0] .=== [DualNumber(3.0, 4.0), DualNumber(6.0, 8.0)])
     end
 
     @testset "derivative" begin
@@ -72,6 +76,8 @@ using Test
         @test derivative(f7, a) == digamma(a) * gamma(a)
         f8(x) = 2^x
         @test derivative(f8, a) == log(2) * 2^a
+        f9(x) = sum(x * [1.0, 2.0])
+        @test derivative(f9, a) == 3.0
 
         h = derivative(f2)
         @test h(2.0) == -0.25
@@ -106,6 +112,8 @@ using Test
         x0 = [2.0, -1.0, pi]
         @test_nowarn jacobian!(jac, f2, x0)
         @test jac == jacobian(f2, x0)
+        f3(x) = x[1] * [1.0, 2.0]
+        @test jacobian(f3, [3.0]) == reshape([1.0, 2.0], 2, 1)
 
         h = jacobian(f1)
         @test isapprox(h(a), J, atol = 1e-15)
