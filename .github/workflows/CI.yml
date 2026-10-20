@@ -31,7 +31,7 @@ jobs:
           - macos-latest
           - windows-latest
         include:
-          - version: '1.11'
+          - version: '1.13'
             os: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
