@@ -6,10 +6,12 @@ using Test
 @testset "SimpleAutoDiff.jl" begin
     @testset "Code quality" begin
         import Aqua
-        using ExplicitImports: check_no_implicit_imports, check_no_stale_explicit_imports
+        using ExplicitImports: test_explicit_imports
         Aqua.test_all(ambiguities = false, SimpleAutoDiff)
-        @test isnothing(check_no_implicit_imports(SimpleAutoDiff))
-        @test isnothing(check_no_stale_explicit_imports(SimpleAutoDiff))
+        # `diffrules` and `diffrule` are documented API of DiffRules.jl, but not declared `public`
+        ignore = (:diffrules, :diffrule)
+        test_explicit_imports(SimpleAutoDiff;
+                              all_qualified_accesses_are_public = (; ignore))
     end
 
     @testset "Dual numbers" begin
