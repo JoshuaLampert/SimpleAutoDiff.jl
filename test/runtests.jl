@@ -56,6 +56,21 @@ using Test
         @test eltype(y) === typeof(y)
         @test only(collect(y)) === y
         @test all(y * [1.0, 2.0] .=== [DualNumber(3.0, 4.0), DualNumber(6.0, 8.0)])
+
+        # Conversion and promotion
+        @test_throws MethodError DualNumber(1 + 2im, 1)
+        @test float(x) === DualNumber(1.0, 2.0)
+        @test convert(DualNumber{Float32}, 0.1) === DualNumber(0.1f0, 0.0f0)
+        @test_throws InexactError convert(DualNumber{Int}, 0.5)
+        @test convert(DualNumber{Float64}, x) === DualNumber(1.0, 2.0)
+        @test promote_type(DualNumber{Float32}, Float64) == DualNumber{Float64}
+        @test promote_type(DualNumber{Int}, DualNumber{Float64}) == DualNumber{Float64}
+        @test [x, y] isa Vector{DualNumber{Float64}}
+        # A dual number with smaller nesting depth is constant w.r.t. the outer perturbation
+        z = DualNumber(y, DualNumber(1.0, 0.0))
+        @test convert(typeof(z), y) === DualNumber(y, DualNumber(0.0, 0.0))
+        @test promote_type(typeof(z), DualNumber{Float32}) == typeof(z)
+        @test y * z === DualNumber(y * y, y)
     end
 
     @testset "derivative" begin
@@ -82,6 +97,13 @@ using Test
         h = derivative(f2)
         @test h(2.0) == -0.25
         @test derivative(derivative(f1), 1.0) == 8.0
+        # Nested derivatives of closures with different nesting depth
+        f10(x) = x * derivative(y -> x * y, x)
+        @test derivative(f10, 3.0) == 6.0
+        # Perturbation confusion: both perturbations have the same nesting depth, which
+        # cannot be distinguished without tags (as in ForwardDiff.jl)
+        f11(x) = x * derivative(y -> x + y, 1.0)
+        @test_broken derivative(f11, 1.0) == 1.0
     end
 
     @testset "gradient" begin
@@ -90,6 +112,7 @@ using Test
         G = [1.0, 0.0]
         @test isapprox(gradient(f1, a), G, atol = 1e-15)
         @test gradient(x -> norm(x)^2, [1.0, 2.0]) == [2.0, 4.0]
+        @test gradient(norm, [3, 4]) ≈ [0.6, 0.8]
         f2(x) = tanh(x[1]) * tan(x[1])
         grad = zeros(2)
         x0 = [2.0, -1.0]
@@ -127,6 +150,8 @@ using Test
         @test isapprox(hessian(f1, a), H, atol = 1e-15)
         @test hessian(x -> norm(x)^2, [1.0, 2.0]) == [2.0 0.0
                                                       0.0 2.0]
+        @test hessian(x -> norm(x)^2, [1, 2]) ≈ [2.0 0.0
+                                                 0.0 2.0]
         f2(x) = tanh(x[1]) * tan(x[1])
         hess = zeros(2, 2)
         x0 = [2.0, -1.0]

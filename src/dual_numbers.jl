@@ -10,7 +10,7 @@ struct DualNumber{T <: Real} <: Real
     deriv::T
 end
 
-function DualNumber(value::T1, deriv::T2) where {T1, T2}
+function DualNumber(value::T1, deriv::T2) where {T1 <: Real, T2 <: Real}
     T = promote_type(T1, T2)
     return DualNumber(convert(T, value), convert(T, deriv))
 end
@@ -18,26 +18,60 @@ end
 value(d::DualNumber) = d.value
 derivative(d::DualNumber) = d.deriv
 
-Base.float(::Type{DualNumber{T}}) where {T} = DualNumber{T}
+# Dual numbers are nested to compute higher-order derivatives, e.g., `hessian` uses
+# `DualNumber{DualNumber{Float64}}`. A dual number with a larger nesting depth carries an
+# additional perturbation in its outermost layer, w.r.t. which a dual number with a smaller
+# nesting depth is constant.
+nesting(::Type{<:Real}) = 0
+nesting(::Type{DualNumber{T}}) where {T} = 1 + nesting(T)
+
+Base.float(::Type{DualNumber{T}}) where {T} = DualNumber{float(T)}
 Base.float(d::DualNumber) = convert(float(typeof(d)), d)
 
-Base.convert(::Type{DualNumber{T}}, x::Number) where {T} = DualNumber(x, zero(T))
+Base.convert(::Type{DualNumber{T}}, x::Real) where {T} = DualNumber{T}(x, zero(T))
 Base.convert(::Type{D}, d::D) where {D <: DualNumber} = d
-Base.promote_rule(::Type{DualNumber{T}}, ::Type{<:Real}) where {T <: Real} = DualNumber{T}
+function Base.convert(::Type{DualNumber{T}}, d::DualNumber{S}) where {T, S}
+    if nesting(T) == nesting(S)
+        # same perturbation: convert the value and the derivative
+        return DualNumber{T}(d.value, d.deriv)
+    else
+        # `d` is constant w.r.t. the outer perturbation
+        return DualNumber{T}(d, zero(T))
+    end
+end
+
+function Base.promote_rule(::Type{DualNumber{T}}, ::Type{R}) where {T, R <: Real}
+    return DualNumber{promote_type(T, R)}
+end
+function Base.promote_rule(::Type{DualNumber{T}}, ::Type{DualNumber{S}}) where {T, S}
+    if nesting(T) == nesting(S)
+        return DualNumber{promote_type(T, S)}
+    elseif nesting(T) > nesting(S)
+        return DualNumber{promote_type(T, DualNumber{S})}
+    else
+        return DualNumber{promote_type(DualNumber{T}, S)}
+    end
+end
 
 # diff rules
 # Define binary diff rules by hand. We are missing some from DiffRules.jl (e.g. atan, hypot, ...),
 # but since they are not essential we skip them for simplicity.
-Base.:+(x::DualNumber, y::DualNumber) = DualNumber(x.value + y.value, x.deriv + y.deriv)
-Base.:-(x::DualNumber, y::DualNumber) = DualNumber(x.value - y.value, x.deriv - y.deriv)
-function Base.:*(x::DualNumber, y::DualNumber)
+# The rules are only defined for dual numbers of the same type. Other combinations are promoted
+# first, which also treats dual numbers with different nesting depth correctly.
+function Base.:+(x::DualNumber{T}, y::DualNumber{T}) where {T}
+    return DualNumber(x.value + y.value, x.deriv + y.deriv)
+end
+function Base.:-(x::DualNumber{T}, y::DualNumber{T}) where {T}
+    return DualNumber(x.value - y.value, x.deriv - y.deriv)
+end
+function Base.:*(x::DualNumber{T}, y::DualNumber{T}) where {T}
     return DualNumber(x.value * y.value, x.value * y.deriv + x.deriv * y.value)
 end
-function Base.:/(x::DualNumber, y::DualNumber)
+function Base.:/(x::DualNumber{T}, y::DualNumber{T}) where {T}
     return DualNumber(x.value / y.value,
                       (x.deriv * y.value - x.value * y.deriv) / y.value^2)
 end
-function Base.:^(x::DualNumber, y::DualNumber)
+function Base.:^(x::DualNumber{T}, y::DualNumber{T}) where {T}
     return DualNumber(x.value^y.value,
                       x.value^(y.value - 1) *
                       (y.value * x.deriv + x.value * y.deriv * log(x.value)))
