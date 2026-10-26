@@ -76,6 +76,12 @@ function Base.:^(x::DualNumber{T}, y::DualNumber{T}) where {T}
                       x.value^(y.value - 1) *
                       (y.value * x.deriv + x.value * y.deriv * log(x.value)))
 end
+# Power rule for a constant exponent: avoids `log(x.value)`, which fails for x.value <= 0
+for R in (AbstractFloat, Rational, AbstractIrrational)
+    @eval function Base.:^(x::DualNumber, y::$R)
+        return DualNumber(x.value^y, y * x.value^(y - 1) * x.deriv)
+    end
+end
 
 # For each unitary rule in DiffRules.jl define a function dispatching on `DualNumber`
 for (M, f, arity) in DiffRules.diffrules(filter_modules = nothing)

@@ -93,6 +93,9 @@ using Test
         @test derivative(f8, a) == log(2) * 2^a
         f9(x) = sum(x * [1.0, 2.0])
         @test derivative(f9, a) == 3.0
+        f10(x) = x^2.0
+        @test derivative(f10, -2.0) == -4.0
+        @test derivative(f10, 0.0) == 0.0
 
         h = derivative(f2)
         @test h(2.0) == -0.25
