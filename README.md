@@ -5,7 +5,7 @@
 [![Aqua QA](https://raw.githubusercontent.com/JuliaTesting/Aqua.jl/master/badge.svg)](https://github.com/JuliaTesting/Aqua.jl)
 [![License: MIT](https://img.shields.io/badge/License-MIT-success.svg)](https://opensource.org/licenses/MIT)
 
-**SimpleAutoDiff.jl** is [Julia](https://julialang.org/) package, which implements simple forward-mode automatic differentiation (AD). It is not
+**SimpleAutoDiff.jl** is a [Julia](https://julialang.org/) package, which implements simple forward-mode automatic differentiation (AD). It is not
 meant to be the most performant implementation, but rather focuses on simplicity and readability of the code. It only implements the core features
 of AD without claiming optimal performance and flexibility. Therefore, it is a good starting point to understand or teach automatic/algorithmic
 differentiation, but is not the perfect choice for production use. For alternative packages performing AD, see the list in https://juliadiff.org/.
@@ -21,7 +21,7 @@ SimpleAutoDiff.jl works with Julia v1.10 and newer. You can install SimpleAutoDi
 ```julia
 julia> using Pkg
 
-julia> Pkg.add("https://github.com/JoshuaLampert/SimpleAutoDiff.jl")
+julia> Pkg.add(url = "https://github.com/JoshuaLampert/SimpleAutoDiff.jl")
 ```
 
 ## Usage
@@ -77,8 +77,8 @@ julia> grad_h([pi, 1])
  -0.5403023058681398
 ```
 
-To avoid allocating a vector for the gradient, you can also call the in-place variant `gradient!` and additionally passing a vector.
-This can be especially useful, when you repeatedly call the gradient.
+To avoid allocating a vector for the gradient, you can also call the in-place variant `gradient!` and additionally pass a vector.
+This can be especially useful when you repeatedly call the gradient.
 
 ```julia
 julia> grad = zeros(2)
@@ -141,6 +141,29 @@ julia> H([3.0, 3.0])
 ```
 
 There also exists the in-place function `hessian!`.
+
+## Limitations
+
+To keep the implementation simple, SimpleAutoDiff.jl has some limitations compared to, e.g., [ForwardDiff.jl](https://github.com/JuliaDiff/ForwardDiff.jl):
+
+- Only one directional derivative is computed per function evaluation. For a function of $n$ variables, `gradient` and `jacobian` evaluate the
+  function $n + 1$ times and `hessian` evaluates it $(n + 1)^2$ times.
+- Differentiation rules are implemented for `+`, `-`, `*`, `/`, `^`, and for all functions of one argument provided by
+  [DiffRules.jl](https://github.com/JuliaDiff/DiffRules.jl). Other functions of several arguments, such as `atan(y, x)`, `hypot`, or `mod`, are not
+  supported and throw an error (for `atan(y, x)` a `StackOverflowError`).
+- Comparisons of dual numbers (e.g., `==`, `<`, `isequal`, and `hash`) only take the values into account. Hence, at points where a function is not
+  differentiable, you get the derivative of one of the branches, e.g., `derivative(abs, 0.0) == 1.0`.
+- Nested derivatives work if the inner derivative is taken w.r.t. a variable that depends on the outer variable, as in `hessian`,
+  `derivative(derivative(f))`, or `derivative(x -> derivative(y -> x * y, x), 3.0)`. However, the derivative is wrong if the inner function is
+  differentiated w.r.t. an independent variable that has the same type as the outer variable:
+
+  ```julia
+  julia> derivative(x -> x * derivative(y -> x + y, 1.0), 1.0) # the correct result is 1.0
+  2.0
+  ```
+
+  Here, both perturbations are represented by a `DualNumber{Float64}` and cannot be distinguished ("perturbation confusion").
+  ForwardDiff.jl avoids this by tagging each perturbation.
 
 ## Authors
 
