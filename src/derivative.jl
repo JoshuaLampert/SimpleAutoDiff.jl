@@ -15,8 +15,8 @@ derivative(f) = x0 -> derivative(f, x0)
 """
     gradient!(grad, f, x0)
 
-Computes the gradient of a function `f` mapping a vector to a scalar evaluated at a value `x0`
-in-place and overwrites `grad` by the gradient.
+Compute the gradient of a function `f` mapping a vector to a scalar evaluated at a value `x0`
+in-place and overwrite `grad` by the gradient.
 
 See also [`gradient`](@ref) for an out-of-place version of the function.
 """
@@ -53,8 +53,8 @@ gradient(f) = x0 -> gradient(f, x0)
 """
     jacobian!(jac, f, x0)
 
-Computes the Jacobian matrix of a function `f` mapping a vector to a vector evaluated at a value `x0`
-in-place and overwrites `jac` by the Jacobian.
+Compute the Jacobian matrix of a function `f` mapping a vector to a vector evaluated at a value `x0`
+in-place and overwrite `jac` by the Jacobian.
 
 See also [`jacobian`](@ref) for an out-of-place version of the function.
 """
@@ -95,8 +95,8 @@ jacobian(f) = x0 -> jacobian(f, x0)
 """
     hessian!(hess, f, x0)
 
-Computes the Hessian matrix of a function `f` mapping a vector to a scalar evaluated at a value `x0`
-in-place and overwrites `hess` by the Hessian.
+Compute the Hessian matrix of a function `f` mapping a vector to a scalar evaluated at a value `x0`
+in-place and overwrite `hess` by the Hessian.
 
 See also [`hessian`](@ref) for an out-of-place version of the function.
 """

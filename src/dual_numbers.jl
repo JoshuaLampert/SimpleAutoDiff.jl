@@ -4,6 +4,9 @@
 A struct representing a dual number ``a + εb``, where ``a`` and ``b`` are real numbers
 representing the `value` and the derivative `deriv` of a function in the context of automatic
 differentiation. Here, ``ε`` is a symbol satisfying ``ε^2 = 0``.
+
+Comparisons of dual numbers (e.g., `==`, `<`, `isequal`, and `hash`) only take the values into
+account, such that control flow behaves in the same way as for the underlying real numbers.
 """
 struct DualNumber{T <: Real} <: Real
     value::T
@@ -15,6 +18,11 @@ function DualNumber(value::T1, deriv::T2) where {T1 <: Real, T2 <: Real}
     return DualNumber(convert(T, value), convert(T, deriv))
 end
 
+"""
+    value(d::DualNumber)
+
+Return the value part of the dual number `d`.
+"""
 value(d::DualNumber) = d.value
 
 """
@@ -93,7 +101,7 @@ for R in (AbstractFloat, Rational, AbstractIrrational)
     end
 end
 
-# For each unitary rule in DiffRules.jl define a function dispatching on `DualNumber`
+# For each unary rule in DiffRules.jl define a function dispatching on `DualNumber`
 # The modules are specified explicitly since all of them need to be loaded
 const DIFFRULES_MODULES = (:Base, :SpecialFunctions, :NaNMath, :LogExpFunctions)
 for (M, f, arity) in DiffRules.diffrules(filter_modules = DIFFRULES_MODULES)
