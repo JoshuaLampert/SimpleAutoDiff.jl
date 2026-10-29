@@ -96,17 +96,19 @@ using Test
         f10(x) = x^2.0
         @test derivative(f10, -2.0) == -4.0
         @test derivative(f10, 0.0) == 0.0
+        @test derivative(x -> x^(1 // 2), 4.0) == 0.25
+        @test derivative(x -> x^π, 1.0) ≈ π
 
         h = derivative(f2)
         @test h(2.0) == -0.25
         @test derivative(derivative(f1), 1.0) == 8.0
         # Nested derivatives of closures with different nesting depth
-        f10(x) = x * derivative(y -> x * y, x)
-        @test derivative(f10, 3.0) == 6.0
+        f11(x) = x * derivative(y -> x * y, x)
+        @test derivative(f11, 3.0) == 6.0
         # Perturbation confusion: both perturbations have the same nesting depth, which
         # cannot be distinguished without tags (as in ForwardDiff.jl)
-        f11(x) = x * derivative(y -> x + y, 1.0)
-        @test_broken derivative(f11, 1.0) == 1.0
+        f12(x) = x * derivative(y -> x + y, 1.0)
+        @test_broken derivative(f12, 1.0) == 1.0
     end
 
     @testset "gradient" begin
