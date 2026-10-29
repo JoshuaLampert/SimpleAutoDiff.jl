@@ -39,7 +39,7 @@ Compute the gradient of a function `f` mapping a vector to a scalar evaluated at
 See also [`gradient!`](@ref) for an in-place version of the function.
 """
 function gradient(f, x0)
-    grad = zeros(typeof(f(x0)), length(x0))
+    grad = similar(x0, float(typeof(f(x0))))
     return gradient!(grad, f, x0)
 end
 
@@ -81,7 +81,7 @@ See also [`jacobian!`](@ref) for an in-place version of the function.
 """
 function jacobian(f, x0)
     fx0 = f(x0)
-    jac = zeros(eltype(fx0), length(fx0), length(x0))
+    jac = zeros(float(eltype(fx0)), length(fx0), length(x0))
     return jacobian!(jac, f, x0)
 end
 

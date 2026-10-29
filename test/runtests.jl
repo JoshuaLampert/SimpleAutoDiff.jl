@@ -98,6 +98,12 @@ using Test
         @test derivative(f10, 0.0) == 0.0
         @test derivative(x -> x^(1 // 2), 4.0) == 0.25
         @test derivative(x -> x^π, 1.0) ≈ π
+        # Constant functions return non-dual numbers
+        @test derivative(x -> 3.0, 1.0) === 0.0
+        @test derivative(3.0) === 0.0
+        # Output types
+        @test derivative(x -> x / 2, 1.0f0) isa Float32
+        @test derivative(sin, big"1.0") isa BigFloat
 
         h = derivative(f2)
         @test h(2.0) == -0.25
@@ -123,6 +129,12 @@ using Test
         x0 = [2.0, -1.0]
         @test_nowarn gradient!(grad, f2, x0)
         @test grad == gradient(f2, x0)
+        @test gradient(x -> 3.0, [1.0, 2.0]) == [0.0, 0.0]
+        # Integer input with non-integer derivatives
+        @test gradient(x -> x[1]^x[1], [2, 1]) ≈ [4 * (1 + log(2)), 0.0]
+        # The gradient has the same shape as the input
+        @test gradient(x -> sum(abs2, x), [1.0 2.0; 3.0 4.0]) == [2.0 4.0; 6.0 8.0]
+        @test gradient(x -> x[1] / 2, Float32[1, 2]) isa Vector{Float32}
 
         h = gradient(f1)
         @test isapprox(h(a), G, atol = 1e-15)
@@ -142,6 +154,9 @@ using Test
         @test jac == jacobian(f2, x0)
         f3(x) = x[1] * [1.0, 2.0]
         @test jacobian(f3, [3.0]) == reshape([1.0, 2.0], 2, 1)
+        @test jacobian(x -> [1.0, 2.0], [3.0]) == zeros(2, 1)
+        # Integer input with non-integer derivatives
+        @test jacobian(x -> [x[1]^x[1]], [2]) ≈ reshape([4 * (1 + log(2))], 1, 1)
 
         h = jacobian(f1)
         @test isapprox(h(a), J, atol = 1e-15)
@@ -162,6 +177,8 @@ using Test
         x0 = [2.0, -1.0]
         @test_nowarn hessian!(hess, f2, x0)
         @test hess == hessian(f2, x0)
+        @test hessian(x -> 3.0, [1.0, 2.0]) == zeros(2, 2)
+        @test hessian(x -> x[1]^2 * x[2], big.([1.0, 2.0])) isa Matrix{BigFloat}
 
         h = hessian(f1)
         @test isapprox(h(a), H, atol = 1e-15)

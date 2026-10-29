@@ -16,7 +16,17 @@ function DualNumber(value::T1, deriv::T2) where {T1 <: Real, T2 <: Real}
 end
 
 value(d::DualNumber) = d.value
+
+"""
+    derivative(d::DualNumber)
+    derivative(x::Real)
+
+Return the derivative part of the dual number `d`. A real number `x`, which is not a
+`DualNumber`, is constant, i.e., its derivative is `zero(x)`. This happens, e.g., for
+constant functions.
+"""
 derivative(d::DualNumber) = d.deriv
+derivative(x::Real) = zero(x)
 
 # Dual numbers are nested to compute higher-order derivatives, e.g., `hessian` uses
 # `DualNumber{DualNumber{Float64}}`. A dual number with a larger nesting depth carries an
@@ -84,7 +94,9 @@ for R in (AbstractFloat, Rational, AbstractIrrational)
 end
 
 # For each unitary rule in DiffRules.jl define a function dispatching on `DualNumber`
-for (M, f, arity) in DiffRules.diffrules(filter_modules = nothing)
+# The modules are specified explicitly since all of them need to be loaded
+const DIFFRULES_MODULES = (:Base, :SpecialFunctions, :NaNMath, :LogExpFunctions)
+for (M, f, arity) in DiffRules.diffrules(filter_modules = DIFFRULES_MODULES)
     if arity == 1
         Mf = M == :Base ? f : :($M.$f)
         @eval function $M.$f(d::DualNumber)
